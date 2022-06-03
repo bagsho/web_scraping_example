@@ -1,0 +1,48 @@
+---
+title: "Web Scraping with rvest package"
+author: "Orhan Aktas"
+date: '2022-06-03'
+output:   
+    html_document:
+      toc: yes
+      number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+# Introduction
+
+
+```{r sample_route_stops, eval=FALSE, include=FALSE}
+
+text_route_link<-"https://athens.doublemap.com/map/text?route=53"
+simple<-read_html(text_route_link)
+
+route_53<-simple %>%
+  html_nodes("a") %>% 
+  html_attr('href')%>% 
+  as_tibble() %>% 
+  mutate(value=as.integer(str_replace(value,"text\\?stop=",""))) %>% 
+  bind_cols(simple %>%
+              html_nodes("a")%>%
+              html_text2() %>%  
+              as_tibble()
+  ) %>% 
+  set_names("stop_id","stop_name")%>% 
+  mutate(stop_seq=row_number()) %>% 
+  relocate(stop_seq)
+
+
+```
