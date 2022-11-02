@@ -1,0 +1,84 @@
+---
+title: "Web Scraping with selector gadget"
+author: "Orhan Aktas"
+date: '2022-11-02'
+output:   
+    html_document:
+      toc: yes
+      number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+# Introduction
+
+
+```{r main, eval=FALSE, include=FALSE}
+
+# stops link
+html <- read_html("https://ridegobus.com/stops/")
+
+# get stop names
+stop_names <- html %>%
+                html_elements(".column-3 a") %>%
+                html_text2() %>%
+                as_tibble() %>% 
+                set_names("stop")
+
+# get stop links
+stop_links <- paste0(
+                "https://ridegobus.com",
+                html %>%
+                  html_elements(".column-3 a") %>%
+                  html_attr("href") %>%
+                  as.character()
+              )
+
+
+
+```
+
+create function to get stop addresses
+```{r}
+
+get_address <- function(stop_link) {
+            address<-read_html(stop_link)%>% 
+            html_element(".col-xs-12 :nth-child(1) .col-10 , .col-xs-12 :nth-child(1) strong") %>%     
+            html_text2() %>% 
+            str_extract_all("(?<=\n).+(?=\n)") %>% 
+            pluck(1)
+            
+            return(address)
+}
+
+```
+
+```{r}
+
+# get stop addresses
+stop_addresses<-stop_links %>%  
+                  map(get_address) %>% 
+                  unlist() %>% 
+                  as_tibble() %>% 
+                  set_names("address") %>% 
+                  bind_cols(stop_names) %>% 
+                  relocate(stop)
+```
+
+save stop address tables
+```{r}
+stop_addresses %>% saveRDS("data/stop_addresses.RDS")
+```
+
