@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 ```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
 library(rvest)
+library(tidygeocoder)
+library(readxl)
 ```
 
 # Introduction
@@ -65,9 +67,9 @@ get_address <- function(stop_link) {
 
 ```
 
+get stop addresses
 ```{r}
 
-# get stop addresses
 stop_addresses<-stop_links %>%  
                   map(get_address) %>% 
                   unlist() %>% 
@@ -80,5 +82,37 @@ stop_addresses<-stop_links %>%
 save stop address tables
 ```{r}
 stop_addresses %>% saveRDS("data/stop_addresses.RDS")
+rm(stop_addresses,stop_names,stop_links)
+```
+
+
+```{r}
+stop_addresses <- readRDS("data/stop_addresses.RDS")
+
+stop_addresses %>%
+  geocode(address, method = 'osm', lat = latitude , long = longitude)%>%
+  saveRDS("data/lat_longs_missing.RDS")
+```
+
+completing missing stops
+```{r}
+
+# read lat_longs table that has missing coordinates
+lat_longs_missing <- readRDS("data/lat_longs_missing.RDS")
+
+# import missing stops that were previously created manually.
+missing_stops <- read_excel("data/missing_stops.xlsx")
+
+# fill the empty missing values from missing stops table
+lat_longs <- lat_longs_missing %>%
+  left_join(missing_stops, by = "stop") %>%
+  mutate(
+    latitude = if_else(is.na(latitude), lat, latitude), 
+    longitude = if_else(is.na(longitude), lon, longitude)
+  ) %>%
+  select(-lat, -lon)
+
+# save lat_longs which has no missing coordinates
+lat_longs %>% saveRDS("data/stop_coordinates.RDS")
 ```
 
