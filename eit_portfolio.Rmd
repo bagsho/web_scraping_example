@@ -1,0 +1,145 @@
+---
+title: "Scraping of eit portfolio"
+author: "Orhan Aktas"
+date: '2023-04-13'
+output:   
+    html_document:
+      toc: yes
+      number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+# Introduction
+listing via going backward
+```{r main, eval=FALSE, include=FALSE}
+
+first_page<-"https://www.eiturbanmobility.eu/startup/hydrogen-first-sp-zoo/"
+
+names<-tibble(link = first_page)
+
+# stops link
+html <- read_html(first_page)
+
+
+
+for (x in 1:59) {
+
+#startsup_load_column
+next_page <- html %>%
+                html_elements(".post_post a") |>
+                html_attr('href') 
+
+names<-names |> add_row(link = next_page)
+
+html <- read_html(next_page)
+
+}
+
+
+#.prev_post a
+```
+
+listing via going forward
+```{r main, eval=FALSE, include=FALSE}
+
+first_page<-"https://www.eiturbanmobility.eu/startup/peregrine-technologies/"
+
+names<-tibble(link = first_page)
+
+# stops link
+html <- read_html(first_page)
+
+
+
+for (x in 1:100) {
+
+#startsup_load_column
+next_page <- html %>%
+                html_elements(".prev_post a") |>
+                html_attr('href') 
+
+names<-names |> add_row(link = next_page)
+
+html <- read_html(next_page)
+
+}
+
+
+
+```
+
+get_information
+
+```{r main, eval=FALSE, include=FALSE}
+
+page<-"https://www.eiturbanmobility.eu/startup/qarin-bv/"
+
+
+html <- read_html(page)
+
+
+
+website <- html|>
+                html_elements(".contact_web a") |>
+                html_attr('href') 
+
+country <- html|>
+                html_elements(".col-xs-12:nth-child(3) .contact_mail") |> 
+                html_text2()
+
+desc_main <- html|>
+                html_elements("#post-8960 p:nth-child(1)") |>
+                html_text2()
+
+desc_dtl <- html|>
+                html_elements("#post-8960 p:nth-child(2)") |>
+                html_text2()
+
+desc_dtl2 <- html|>
+                html_elements("#post-13522 p") |>
+                html_text2()
+
+partcpt_year<-html|>
+                html_elements(".ass_year .contact_mail") |>
+                html_text2()
+
+assct_hub<-html|>
+                html_elements(".ass_region a") |>
+                html_text2()
+
+address<-html|>
+                html_elements(".stup_cont_add") |>
+                html_text2()
+
+founded_date<-html|>
+                html_elements(".col-md-3:nth-child(2) .contact_mail") |>
+                html_text2()
+
+contact<-html|>
+                html_elements(".col-md-5 .contact_mail") |>
+                html_text2()
+
+programme<-html|>
+                html_elements(".ass_programe a") |>
+                html_text2()
+
+
+
+
+
+
+
+```
