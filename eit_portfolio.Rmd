@@ -91,63 +91,63 @@ get_information
 page<-"https://www.eiturbanmobility.eu/startup/motiontag/"
 
 # get name of the startup
-startup_i<- substr( page,41, nchar(page)-1)
+startup<- substr( page,41, nchar(page)-1)
 
 # read html
 html <- read_html(page)
 
 # get website of the startup
-website_i<- html|>
+website<- html|>
                 html_elements(".contact_web a") |>
                 html_attr('href') 
 
 # get country of the startup
-country_i <- html|>
+country <- html|>
                 html_elements(".col-xs-12:nth-child(3) .contact_mail") |> 
                 html_text2()
 
 # get main description of the startup
-desc_main_i <- html|>
+desc_main <- html|>
                 html_elements("#post-8960 p:nth-child(1)") |>
                 html_text2()
 
 # get detailed description of the startup
-desc_dtl_i <- html|>
+desc_dtl <- html|>
                 html_elements("#post-8960 p:nth-child(2)") |>
                 html_text2()
 
 # get second detailed description of the startup
-desc_dtl2_i <- html|>
+desc_dtl2 <- html|>
                 html_elements("#post-13522 p") |>
                 html_text2()
 
 # get participation year of the startup
-partcpt_year_i<-html|>
+partcpt_year<-html|>
                 html_elements(".ass_year .contact_mail") |>
                 html_text2()
 
 # get associated hub
-assct_hub_i<-html|>
+assct_hub<-html|>
                 html_elements(".ass_region a") |>
                 html_text2()
 
 # get address of the startup
-address_i<-html|>
+address<-html|>
                 html_elements(".stup_cont_add") |>
                 html_text2()
 
 # get the year the startup founded
-founded_date_i<-html|>
+founded_date<-html|>
                 html_elements(".col-md-3:nth-child(2) .contact_mail") |>
                 html_text2()
 
 # get contact email of the startup
-contact_i<-html|>
+contact<-html|>
                 html_elements(".col-md-5 .contact_mail") |>
                 html_text2()
 
 # get associated program
-programme_i<-html|>
+programme<-html|>
                 html_elements(".ass_programe a") |>
                 html_text2()
 
@@ -158,38 +158,44 @@ programme_i<-html|>
 
 
 
-# write all to the main table
-names<- tibble (
-          startup="c(startup_i)",
-          page=c(page),
-          website=c(website_i),
-          country=c(country_i),
-          desc_main=c(desc_main_i),
-          desc_dtl=c(desc_dtl_i),
-          desc_dtl2=c(desc_dtl2_i),
-          partcpt_year=c(partcpt_year_i),
-          assct_hub=c(assct_hub_i),
-          address=c(address_i),
-          founded_date=c(founded_date_i),
-          contact=c(contact_i),
-          programme=c(programme_i)
-        )
 
 # write all to the main table
 names<- names |> add_row (
-          startup=startup,
-          page=page,
-          website=website,
-          country=country,
-          desc_main=desc_main,
-          desc_dtl=desc_dtl,
-          desc_dtl2=desc_dtl2,
-          partcpt_year=partcpt_year,
-          assct_hub=assct_hub,
-          address=address,
-          founded_date=founded_date,
-          contact=contact,
-          programme=programme
+          startup=ifelse(identical(startup, character(0)),"",startup),
+          page=ifelse(identical(page, character(0)),"",page),
+          website=ifelse(identical(website, character(0)),"",website),
+          country=ifelse(identical(country, character(0)),"",country),
+          desc_main=ifelse(identical(desc_main, character(0)),"",desc_main),
+          desc_dtl=ifelse(identical(desc_dtl, character(0)),"",desc_dtl),
+          desc_dtl2=ifelse(identical(desc_dtl2, character(0)),"",desc_dtl2),
+          partcpt_year=ifelse(identical(partcpt_year, character(0)),"",partcpt_year),
+          assct_hub=ifelse(identical(assct_hub, character(0)),"",assct_hub),
+          address=ifelse(identical(address, character(0)),"",address),
+          founded_date=ifelse(identical(founded_date, character(0)),"",founded_date),
+          contact=ifelse(identical(contact, character(0)),"",contact),
+          programme=ifelse(identical(programme, character(0)),"",programme)
         )
 
 ```
+
+
+create the main table
+```{r}
+
+names<- tibble (
+          startup=character(),
+          page=character(),
+          website=character(),
+          country=character(),
+          desc_main=character(),
+          desc_dtl=character(),
+          desc_dtl2=character(),
+          partcpt_year=character(),
+          assct_hub=character(),
+          address=character(),
+          founded_date=character(),
+          contact=character(),
+          programme=character()
+        )
+```
+
