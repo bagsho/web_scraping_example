@@ -31,9 +31,7 @@ names<- tibble (
           page=character(),
           website=character(),
           country=character(),
-          desc_main=character(),
-          desc_dtl=character(),
-          desc_dtl2=character(),
+          description=character(),
           partcpt_year=character(),
           assct_hub=character(),
           address=character(),
@@ -54,7 +52,7 @@ page<-"https://www.eiturbanmobility.eu/startup/motiontag/"
 get information of all pages
 ```{r}
 
-for (x in 1:2) {
+for (x in 1:200) {
   
   output<-get_startup_details(page,names)
   
@@ -90,22 +88,12 @@ website<- html|>
 
 # get country of the startup
 country <- html|>
-                html_elements(".col-xs-12:nth-child(3) .contact_mail") |> 
+                html_elements(".col-md-3:nth-child(2)") |> 
                 html_text2()
 
 # get main description of the startup
-desc_main <- html|>
-                html_elements("#post-8960 p:nth-child(1)") |>
-                html_text2()
-
-# get detailed description of the startup
-desc_dtl <- html|>
-                html_elements("#post-8960 p:nth-child(2)") |>
-                html_text2()
-
-# get second detailed description of the startup
-desc_dtl2 <- html|>
-                html_elements("#post-13522 p") |>
+description <- html|>
+                html_elements(".project-description-cont") |>
                 html_text2()
 
 # get participation year of the startup
@@ -125,7 +113,7 @@ address<-html|>
 
 # get the year the startup founded
 founded_date<-html|>
-                html_elements(".col-md-3:nth-child(2) .contact_mail") |>
+                html_elements(".col-md-3:nth-child(1)") |>
                 html_text2()
 
 # get contact email of the startup
@@ -151,9 +139,7 @@ names<- names |> add_row (
           page=ifelse(identical(page, character(0)),"",page),
           website=ifelse(identical(website, character(0)),"",website),
           country=ifelse(identical(country, character(0)),"",country),
-          desc_main=ifelse(identical(desc_main, character(0)),"",desc_main),
-          desc_dtl=ifelse(identical(desc_dtl, character(0)),"",desc_dtl),
-          desc_dtl2=ifelse(identical(desc_dtl2, character(0)),"",desc_dtl2),
+          description=ifelse(identical(description, character(0)),"",description),
           partcpt_year=ifelse(identical(partcpt_year, character(0)),"",partcpt_year),
           assct_hub=ifelse(identical(assct_hub, character(0)),"",assct_hub),
           address=ifelse(identical(address, character(0)),"",address),
