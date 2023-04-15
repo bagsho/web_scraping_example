@@ -22,73 +22,60 @@ library(tidyverse)
 library(rvest)
 ```
 
-# Introduction
-listing via going backward
-```{r main, eval=FALSE, include=FALSE}
 
-# initial page
-first_page<-"https://www.eiturbanmobility.eu/startup/motiontag/"
+create the main table
+```{r}
 
-# create the main tibble
-names<-tibble(link = first_page)
-
-# read html of the first page
-html <- read_html(first_page)
-
-
-
-for (x in 1:2) {
-
-#startsup_load_column
-next_page <- html %>%
-                html_elements(".post_post a") |>
-                html_attr('href') 
-
-names<-names |> add_row(link = next_page)
-
-html <- read_html(next_page)
-
-}
-
-
-#.prev_post a
+names<- tibble (
+          startup=character(),
+          page=character(),
+          website=character(),
+          country=character(),
+          desc_main=character(),
+          desc_dtl=character(),
+          desc_dtl2=character(),
+          partcpt_year=character(),
+          assct_hub=character(),
+          address=character(),
+          founded_date=character(),
+          contact=character(),
+          programme=character()
+        )
 ```
 
-listing via going forward
-```{r main, eval=FALSE, include=FALSE}
-
-first_page<-"https://www.eiturbanmobility.eu/startup/peregrine-technologies/"
-
-names<-tibble(link = first_page)
-
-# stops link
-html <- read_html(first_page)
-
-
-
-for (x in 1:100) {
-
-#startsup_load_column
-next_page <- html %>%
-                html_elements(".prev_post a") |>
-                html_attr('href') 
-
-names<-names |> add_row(link = next_page)
-
-html <- read_html(next_page)
-
-}
-
-
-
-```
-
-get_information
-
-```{r main, eval=FALSE, include=FALSE}
-
+initial page
+```{r}
 
 page<-"https://www.eiturbanmobility.eu/startup/motiontag/"
+
+```
+
+
+get information of all pages
+```{r}
+
+for (x in 1:2) {
+  
+  output<-get_startup_details(page,names)
+  
+  page<-output |> pluck(1)
+  
+  names<-output |> pluck(2)
+  
+  rm(output)
+  
+}
+
+```
+
+
+
+define function
+
+```{r main, eval=FALSE, include=FALSE}
+
+get_startup_details <- function(page,names) {
+
 
 # get name of the startup
 startup<- substr( page,41, nchar(page)-1)
@@ -152,7 +139,6 @@ programme<-html|>
                 html_text2()
 
 
-# buradan aşağıda veriler ana tabloya koyulacak. alttakinde önce tablo yaratılıyor. sonrakinde ise satır eklenecek. ancak atama yapılmayan değişkenler boş olduğu için tibble ilk satırı eklemiyor. burada kaldım. 
 
 # tam olarak şunu yapacağız. en son sayfada olan startup'ı buldum. buradaki sayfa. buradan verileri toplayarak geriye doğru gideceğiz. ileri doğru gitmemiz daha mantıklı olur sanki. sona bir startup eklenirse ileriye doğru giderken her zaman onu da almış oluruz.
 
@@ -176,26 +162,17 @@ names<- names |> add_row (
           programme=ifelse(identical(programme, character(0)),"",programme)
         )
 
+# get the page of next startup
+next_page <- html %>%
+                html_elements(".post_post a") |>
+                html_attr('href') 
+
+return(list(next_page,names))
+
+}
+
 ```
 
 
-create the main table
-```{r}
 
-names<- tibble (
-          startup=character(),
-          page=character(),
-          website=character(),
-          country=character(),
-          desc_main=character(),
-          desc_dtl=character(),
-          desc_dtl2=character(),
-          partcpt_year=character(),
-          assct_hub=character(),
-          address=character(),
-          founded_date=character(),
-          contact=character(),
-          programme=character()
-        )
-```
 
